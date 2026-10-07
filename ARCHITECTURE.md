@@ -44,7 +44,7 @@ SmartFA/
 └── .github/workflows/   # ci.yml, refresh.yml (cron), linkcheck.yml (cron)
 ```
 
-**Ownership rule:** every directory and file belongs to exactly one task card (see TASKS.md). Parallel agents never write to the same path.
+**Ownership rule:** every directory and file belongs to exactly one task card (see TASKS.md). Parallel agents never write to the same path. Each card works on its own `card/<ID>` branch, and the orchestrator merges.
 
 ## 3. Data schemas (draft)
 

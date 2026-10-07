@@ -9,8 +9,8 @@ Each card is one unit of work for one sub-agent.
 1. **Only write to the paths in your card's `Owns` field.** If you need a change somewhere else, write it under "Requests for other cards" at the end of your output file.
 2. Read `PLAN.md` §6 (non-negotiable constraints) before starting.
 3. Cite sources for every fact. Mark uncertain items `(verify)`.
-4. Finish by updating your card's status line in this file. That is the only edit to TASKS.md you may make.
-5. Open one PR, or make one commit, per card. Commit message: `<CARD-ID>: <summary>`.
+4. **Never edit TASKS.md.** Put your status in your output file's header (`Status:` field, see `research/_TEMPLATE.md`). Only the orchestrator (a human or the lead agent) updates the status columns here.
+5. Work on branch `card/<CARD-ID>`, or use the Agent tool with `isolation: "worktree"`. Commit message: `<CARD-ID>: <summary>`. Don't push to `main`. The orchestrator reviews and merges.
 
 ## Status key
 
@@ -27,7 +27,8 @@ You are working on SmartFA (repo root: <path>). Read README.md, PLAN.md §6, and
 ARCHITECTURE.md first. Your task card is <CARD-ID> in TASKS.md — follow it exactly.
 You may ONLY write to: <Owns paths>. Inputs to read: <Inputs>.
 Done when: <Acceptance>. Cite every factual claim with URL + access date.
-When finished, set the card status to REVIEW and commit as "<CARD-ID>: <summary>".
+Work on branch card/<CARD-ID>. Do NOT edit TASKS.md and do NOT push to main.
+When finished, set Status: REVIEW in your output file's header and commit as "<CARD-ID>: <summary>".
 ```
 
 ---
@@ -65,7 +66,7 @@ Agent type: `Plan` for drafting, then a human sign-off (gate G3).
 - **Depends:** R10 (G2), R02, R03
 - **Owns:** `engine/src/schema/` (Zod schemas), `data/README.md`
 - **Inputs:** ARCHITECTURE.md §3, research files
-- **Acceptance:** Zod schemas cover Provider, Product (with per-category feature sub-schemas for every M1 category), PremiumTable, Scheme/Constant and Provenance. Includes one valid example JSON per category. `scripts/validate` (stub) can import the schemas.
+- **Acceptance:** Zod schemas cover Provider, Product (with per-category feature sub-schemas for every M1 category), PremiumTable, Scheme/Constant and Provenance. Includes one valid example JSON per category (in `engine/src/schema/examples/`). All schemas are exported from `engine/src/schema/index.ts`.
 - **Status:** TODO
 
 ### D02: Questionnaire spec
@@ -76,8 +77,8 @@ Agent type: `Plan` for drafting, then a human sign-off (gate G3).
 
 ### D03: Rules spec
 - **Depends:** R09, R02, R03, G1
-- **Owns:** `specs/rules.md`
-- **Acceptance:** a decision table for M1 with rule ID, condition, output, priority, rationale, source and constants used. "See a professional" triggers are listed. At least 20 persona cases have expected outputs worked by hand.
+- **Owns:** `specs/rules.md`, `engine/tests/personas/*.json`
+- **Acceptance:** a decision table for M1 with rule ID, condition, output, priority, rationale, source and constants used. "See a professional" triggers are listed. At least 20 persona cases have expected outputs worked by hand and saved as fixtures in `engine/tests/personas/`.
 - **Status:** TODO
 
 ### D04: UX and information architecture
@@ -105,8 +106,8 @@ Agent type: `general-purpose`.
 
 ### B02: Rules engine
 - **Depends:** D01, D02, D03
-- **Owns:** `engine/` (except `engine/src/schema/`, which is owned by D01)
-- **Acceptance:** implements ARCHITECTURE.md §4. All persona fixtures from D03 pass. Every output number has a trace. Contains no network or DOM code. `FEATURE_RANKING` defaults to off.
+- **Owns:** `engine/` (except `engine/src/schema/`, owned by D01, and `engine/tests/personas/`, owned by D03 and Q01)
+- **Acceptance:** implements ARCHITECTURE.md §4. All persona fixtures from D03 pass. If a fixture looks wrong, raise it under "Requests for other cards" instead of editing it. Every output number has a trace. Contains no network or DOM code. `FEATURE_RANKING` defaults to off.
 - **Status:** TODO
 
 ### B03: Questionnaire UI
@@ -176,7 +177,7 @@ Agent type: `general-purpose`. These cards are split by provider or topic so the
 ### P01: Validation and refresh scripts
 - **Depends:** D01, R10
 - **Owns:** `scripts/`
-- **Acceptance:** `validate` checks every JSON file against the schemas. `refresh/<provider>` fetches and extracts data and writes a diff. `linkcheck` and `staleness` produce reports. All are runnable locally.
+- **Acceptance:** `validate` checks every JSON file against the schemas exported by `engine/src/schema/index.ts`. `refresh/<provider>` fetches and extracts data and writes a diff. `linkcheck` and `staleness` produce reports. All are runnable locally.
 - **Status:** TODO
 
 ### P02: Scheduled workflows
